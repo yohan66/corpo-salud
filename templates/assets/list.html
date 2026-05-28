@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Inventario de Activos{% endblock %}
+
+{% block content %}
+<h2>📦 Inventario de Bienes</h2>
+
+<div class="card">
+    <h3>🔍 Filtros de Búsqueda</h3>
+    <form method="GET" action="{{ url_for('list_assets') }}">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Tipo de Activo</label>
+                <select name="asset_type">
+                    <option value="">Todos</option>
+                    <option value="ESTADAL" {% if asset_type == 'ESTADAL' %}selected{% endif %}>Bienes Estadales</option>
+                    <option value="NACIONAL" {% if asset_type == 'NACIONAL' %}selected{% endif %}>Bienes Nacionales</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Categoría</label>
+                <select name="category">
+                    <option value="">Todas</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if category == cat.id|string %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Estado</label>
+                <select name="status">
+                    <option value="">Todos</option>
+                    <option value="ACTIVO" {% if status == 'ACTIVO' %}selected{% endif %}>Activo</option>
+                    <option value="INACTIVO" {% if status == 'INACTIVO' %}selected{% endif %}>Inactivo</option>
+                    <option value="EN MANTENIMIENTO" {% if status == 'EN MANTENIMIENTO' %}selected{% endif %}>Mantenimiento</option>
+                    <option value="DAÑADO" {% if status == 'DAÑADO' %}selected{% endif %}>Dañado</option>
+                    <option value="EXTRAVIADO" {% if status == 'EXTRAVIADO' %}selected{% endif %}>Extraviado</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Ubicación</label>
+                <select name="location">
+                    <option value="">Todas</option>
+                    {% for loc in locations %}
+                    <option value="{{ loc.id }}" {% if location == loc.id|string %}selected{% endif %}>{{ loc.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Buscar (Código, Serie, Nombre)</label>
+                <input type="text" name="search" value="{{ search }}" placeholder="Ingrese texto...">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">🔍 Buscar</button>
+        <a href="{{ url_for('list_assets') }}" class="btn">Limpiar</a>
+    </form>
+</div>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3>📋 Lista de Activos</h3>
+        <a href="{{ url_for('new_asset') }}" class="btn btn-success">➕ Nuevo Activo</a>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Tipo</th>
+                <th>Categoría</th>
+                <th>Ubicación</th>
+                <th>Estado</th>
+                <th>Asignado a</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asset in assets.items %}
+            <tr>
+                <td><strong>{{ asset.barcode }}</strong></td>
+                <td>{{ asset.name[:40] }}</td>
+                <td><span class="badge {% if asset.asset_type == 'ESTADAL' %}badge-state{% else %}badge-national{% endif %}">{{ asset.asset_type }}</span></td>
+                <td>{{ asset.category.name if asset.category else 'N/A' }}</td>
+                <td>{{ asset.location.name if asset.location else 'N/A' }}</td>
+                <td><span class="badge badge-{{ asset.status.lower() }}">{{ asset.status }}</span></td>
+                <td>{{ asset.assigned_to or '-' }}</td>
+                <td>
+                    <a href="{{ url_for('asset_detail', asset_id=asset.id) }}" class="btn btn-info" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Ver</a>
+                    <a href="{{ url_for('edit_asset', asset_id=asset.id) }}" class="btn btn-warning" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Editar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if pagination.pages > 1 %}
+    <div class="pagination">
+        {% if pagination.has_prev %}
+        <a href="{{ url_for('list_assets', page=pagination.prev_num, asset_type=asset_type, category=category, status=status, location=location, search=search) }}">‹ Anterior</a>
+        {% endif %}
+        
+        {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if page_num %}
+                {% if page_num == pagination.page %}
+                <span class="current">{{ page_num }}</span>
+                {% else %}
+                <a href="{{ url_for('list_assets', page=page_num, asset_type=asset_type, category=category, status=status, location=location, search=search) }}">{{ page_num }}</a>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        
+        {% if pagination.has_next %}
+        <a href="{{ url_for('list_assets', page=pagination.next_num, asset_type=asset_type, category=category, status=status, location=location, search=search) }}">Siguiente ›</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

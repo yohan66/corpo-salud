@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Inventario{% endblock %}
+
+{% block content %}
+<h2 style="margin-bottom: 1.5rem;">📊 Dashboard de Inventario</h2>
+
+<div class="stats-grid">
+    <div class="stat-card blue">
+        <div class="number">{{ total_assets }}</div>
+        <div class="label">Total de Activos</div>
+    </div>
+    <div class="stat-card">
+        <div class="number" style="color: #2a5298;">{{ state_assets }}</div>
+        <div class="label">Bienes Estadales</div>
+    </div>
+    <div class="stat-card">
+        <div class="number" style="color: #d35400;">{{ national_assets }}</div>
+        <div class="label">Bienes Nacionales</div>
+    </div>
+    <div class="stat-card green">
+        <div class="number">{{ active_assets }}</div>
+        <div class="label">Operativos</div>
+    </div>
+    <div class="stat-card orange">
+        <div class="number">{{ maintenance_assets }}</div>
+        <div class="label">En Mantenimiento</div>
+    </div>
+    <div class="stat-card red">
+        <div class="number">{{ damaged_assets + lost_assets }}</div>
+        <div class="label">Dañados/Extraviados</div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>📈 Activos por Categoría</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1rem;">
+        {% for cat in category_stats %}
+        <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; border-left: 4px solid #2a5298; min-width: 200px;">
+            <div style="font-weight: 600; color: #1e3c72;">{{ cat.name }}</div>
+            <div style="font-size: 1.8rem; font-weight: bold; color: #2a5298;">{{ cat.count }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="card">
+    <h2>📝 Transferencias Recientes</h2>
+    {% if recent_transfers %}
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Activo</th>
+                <th>Desde</th>
+                <th>Hacia</th>
+                <th>Responsable</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in recent_transfers %}
+            <tr>
+                <td>{{ t.transfer_date.strftime('%d/%m/%Y') }}</td>
+                <td>{{ t.asset.name[:30] }}</td>
+                <td>{{ t.from_location.name if t.from_location else 'N/A' }}</td>
+                <td>{{ t.to_location.name }}</td>
+                <td>{{ t.transferred_by }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="text-align: center; color: #666; padding: 2rem;">No hay transferencias registradas</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>🔧 Mantenimiento Reciente</h2>
+    {% if recent_maintenance %}
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Activo</th>
+                <th>Tipo</th>
+                <th>Descripción</th>
+                <th>Ejecutado por</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in recent_maintenance %}
+            <tr>
+                <td>{{ m.date.strftime('%d/%m/%Y') }}</td>
+                <td>{{ m.asset.name[:30] }}</td>
+                <td><span class="badge">{{ m.type }}</span></td>
+                <td>{{ m.description[:50] }}</td>
+                <td>{{ m.performed_by }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="text-align: center; color: #666; padding: 2rem;">No hay registros de mantenimiento</p>
+    {% endif %}
+</div>
+{% endblock %}

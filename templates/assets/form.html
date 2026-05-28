@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ 'Editar' if asset else 'Nuevo' }} Activo{% endblock %}
+
+{% block content %}
+<h2>{{ '✏️ Editar' if asset else '➕ Nuevo' }} Activo</h2>
+
+<div class="card">
+    <form method="POST" action="{{ url_for('edit_asset' if asset else 'new_asset', asset_id=asset.id if asset else None) }}">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="asset_type">Tipo de Activo *</label>
+                <select id="asset_type" name="asset_type" required>
+                    <option value="ESTADAL" {% if asset and asset.asset_type == 'ESTADAL' or not asset %}selected{% endif %}>Bien Estadales</option>
+                    <option value="NACIONAL" {% if asset and asset.asset_type == 'NACIONAL' %}selected{% endif %}>Bien Nacionales</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="barcode">Código de Barras *</label>
+                <input type="text" id="barcode" name="barcode" value="{{ asset.barcode if asset }}" required>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="serial_number">Número de Serie</label>
+                <input type="text" id="serial_number" name="serial_number" value="{{ asset.serial_number if asset }}">
+            </div>
+            <div class="form-group">
+                <label for="rfid_tag">Etiqueta RFID</label>
+                <input type="text" id="rfid_tag" name="rfid_tag" value="{{ asset.rfid_tag if asset }}">
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group" style="flex: 2;">
+                <label for="name">Nombre del Activo *</label>
+                <input type="text" id="name" name="name" value="{{ asset.name if asset }}" required>
+            </div>
+            <div class="form-group">
+                <label for="model">Modelo</label>
+                <input type="text" id="model" name="model" value="{{ asset.model if asset }}">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Descripción</label>
+            <textarea id="description" name="description" rows="2">{{ asset.description if asset }}</textarea>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="category_id">Categoría *</label>
+                <select id="category_id" name="category_id" required>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if asset and asset.category_id == cat.id or not asset and loop.first %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="brand_id">Marca</label>
+                <select id="brand_id" name="brand_id">
+                    <option value="">Sin Marca</option>
+                    {% for brand in brands %}
+                    <option value="{{ brand.id }}" {% if asset and asset.brand_id == brand.id %}selected{% endif %}>{{ brand.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="location_id">Ubicación *</label>
+                <select id="location_id" name="location_id" required>
+                    <option value="">Seleccionar...</option>
+                    {% for loc in locations %}
+                    <option value="{{ loc.id }}" {% if asset and asset.location_id == loc.id or not asset and loc.code == 'LOC-ST-001' %}selected{% endif %}>[{{ loc.type }}] {{ loc.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="assigned_to">Asignado a</label>
+                <input type="text" id="assigned_to" name="assigned_to" value="{{ asset.assigned_to if asset }}">
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="acquisition_date">Fecha de Adquisición</label>
+                <input type="date" id="acquisition_date" name="acquisition_date" value="{{ asset.acquisition_date.strftime('%Y-%m-%d') if asset and asset.acquisition_date }}">
+            </div>
+            <div class="form-group">
+                <label for="warranty_expiry">Fin de Garantía</label>
+                <input type="date" id="warranty_expiry" name="warranty_expiry" value="{{ asset.warranty_expiry.strftime('%Y-%m-%d') if asset and asset.warranty_expiry }}">
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="purchase_price">Precio de Compra</label>
+                <input type="number" id="purchase_price" name="purchase_price" step="0.01" value="{{ asset.purchase_price if asset }}" placeholder="Bs.">
+            </div>
+            <div class="form-group">
+                <label for="invoice_number">N° de Factura</label>
+                <input type="text" id="invoice_number" name="invoice_number" value="{{ asset.invoice_number if asset }}">
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="status">Estado *</label>
+                <select id="status" name="status" required>
+                    <option value="ACTIVO" {% if asset and asset.status == 'ACTIVO' or not asset %}selected{% endif %}>Activo</option>
+                    <option value="INACTIVO" {% if asset and asset.status == 'INACTIVO' %}selected{% endif %}>Inactivo</option>
+                    <option value="EN MANTENIMIENTO" {% if asset and asset.status == 'EN MANTENIMIENTO' %}selected{% endif %}>En Mantenimiento</option>
+                    <option value="DAÑADO" {% if asset and asset.status == 'DAÑADO' %}selected{% endif %}>Dañado</option>
+                    <option value="EXTRAVIADO" {% if asset and asset.status == 'EXTRAVIADO' %}selected{% endif %}>Extraviado</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="condition">Condición</label>
+                <select id="condition" name="condition">
+                    <option value="NEW" {% if asset and asset.condition == 'NEW' or not asset %}selected{% endif %}>Nuevo</option>
+                    <option value="GOOD" {% if asset and asset.condition == 'GOOD' or not asset %}selected{% endif %}>Bueno</option>
+                    <option value="FAIR" {% if asset and asset.condition == 'FAIR' %}selected{% endif %}>Regular</option>
+                    <option value="POOR" {% if asset and asset.condition == 'POOR' %}selected{% endif %}>Malo</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" id="is_operational" name="is_operational" {% if not asset or asset.is_operational %}checked{% endif %} style="width: auto;">
+                <span>Operativo / Funcional</span>
+            </label>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group" style="flex: 2;">
+                <label for="spec_processor">Especificación: Procesador</label>
+                <input type="text" id="spec_processor" name="spec_processor" value="{{ asset.specifications.processor if asset and asset.specifications and asset.specifications.processor }}">
+            </div>
+            <div class="form-group">
+                <label for="spec_ram">RAM</label>
+                <input type="text" id="spec_ram" name="spec_ram" value="{{ asset.specifications.ram if asset and asset.specifications and asset.specifications.ram }}">
+            </div>
+            <div class="form-group">
+                <label for="spec_storage">Almacenamiento</label>
+                <input type="text" id="spec_storage" name="spec_storage" value="{{ asset.specifications.storage if asset and asset.specifications and asset.specifications.storage }}">
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary">💾 Guardar Activo</button>
+            <a href="{{ url_for('list_assets') }}" class="btn">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

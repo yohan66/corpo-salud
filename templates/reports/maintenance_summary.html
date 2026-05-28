@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Resumen de Mantenimiento{% endblock %}
+
+{% block content %}
+<h2>🔧 Reporte: Resumen de Mantenimiento</h2>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="number">{{ preventive }}</div>
+        <div class="label">Preventivos</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">{{ corrective }}</div>
+        <div class="label">Correctivos</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">{{ inspection }}</div>
+        <div class="label">Inspecciones</div>
+    </div>
+    <div class="stat-card red">
+        <div class="number">${{ "{:,.2f}".format(total_cost) }}</div>
+        <div class="label">Costo Total</div>
+    </div>
+</div>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3>Registros Recientes</h3>
+        <button onclick="window.print()" class="btn btn-primary">🖨️ Imprimir</button>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Activo</th>
+                <th>Tipo</th>
+                <th>Título</th>
+                <th>Ejecutado por</th>
+                <th>Costo</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+            <tr>
+                <td>{{ record.date.strftime('%d/%m/%Y') }}</td>
+                <td>{{ record.asset.name[:30] }}</td>
+                <td><span class="badge">{{ record.type }}</span></td>
+                <td>{{ record.title }}</td>
+                <td>{{ record.performed_by }}</td>
+                <td>Bs. {{ "{:,.2f}".format(record.cost) if record.cost else '-' }}</td>
+                <td><span class="badge">{{ record.status }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div style="text-align: center; margin-top: 2rem;">
+    <a href="{{ url_for('reports') }}" class="btn">← Volver a Reportes</a>
+</div>
+{% endblock %}

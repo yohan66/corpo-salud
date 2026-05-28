@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Reportes - Inventario{% endblock %}
+
+{% block content %}
+<h2>📊 Reportes del Sistema de Inventario</h2>
+<p>Seleccione el tipo de reporte que desea generar:</p>
+
+<div class="stats-grid" style="margin-top: 2rem;">
+    <a href="{{ url_for('report_assets_by_category') }}" class="stat-card blue" style="text-decoration: none; color: inherit;">
+        <div class="number" style="font-size: 2rem;">📄</div>
+        <div class="label">Por Categoría</div>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Distribución de activos por categoría</p>
+    </a>
+    
+    <a href="{{ url_for('report_assets_by_status') }}" class="stat-card green" style="text-decoration: none; color: inherit;">
+        <div class="number" style="font-size: 2rem;">📈</div>
+        <div class="label">Por Estado</div>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Activos según su estado actual</p>
+    </a>
+    
+    <a href="{{ url_for('report_assets_by_location') }}" class="stat-card orange" style="text-decoration: none; color: inherit;">
+        <div class="number" style="font-size: 2rem;">📍</div>
+        <div class="label">Por Ubicación</div>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Distribución por departamentos</p>
+    </a>
+    
+    <a href="{{ url_for('report_warranty_expiring') }}" class="stat-card red" style="text-decoration: none; color: inherit;">
+        <div class="number" style="font-size: 2rem;">⚠️</div>
+        <div class="label">Garantía por Vencer</div>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Activos con garantía próxima a vencer</p>
+    </a>
+    
+    <a href="{{ url_for('report_maintenance_summary') }}" class="stat-card" style="text-decoration: none; color: inherit; border-left-color: #9b59b6;">
+        <div class="number" style="font-size: 2rem;">🔧</div>
+        <div class="label">Mantenimiento</div>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Resumen de registros de mantenimiento</p>
+    </a>
+</div>
+
+<div class="card" style="margin-top: 3rem;">
+    <h3>📋 Información del Sistema</h3>
+    <div class="form-row">
+        <div class="form-group">
+            <label><strong>Total de Activos Registrados:</strong></div>
+            <p>{{ total_assets }}</p>
+        </div>
+        <div class="form-group">
+            <label><strong>Bienes Estadales:</strong></div>
+            <p>{{ state_assets }}</p>
+        </div>
+        <div class="form-group">
+            <label><strong>Bienes Nacionales:</strong></div>
+            <p>{{ national_assets }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

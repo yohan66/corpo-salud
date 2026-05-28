@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Reporte por Estado{% endblock %}
+
+{% block content %}
+<h2>📄 Reporte: Activos por Estado</h2>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3>Resumen</h3>
+        <button onclick="window.print()" class="btn btn-primary">🖨️ Imprimir</button>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Estado</th>
+                <th>Cantidad</th>
+                <th>Porcentaje</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set total = data|sum(attribute='count') %}
+            {% for item in data %}
+            <tr>
+                <td><span class="badge badge-{{ item.status.lower() }}">{{ item.status }}</span></td>
+                <td>{{ item.count }}</td>
+                <td>{{ "%.1f"|format((item.count / total * 100) if total > 0 else 0) }}%</td>
+                <td>
+                    {% if item.status == 'ACTIVO' %}Operativo y en uso{% elif item.status == 'INACTIVO' %}No en uso{% elif item.status == 'EN MANTENIMIENTO' %}En reparación o revisión{% elif item.status == 'DAÑADO' %}Requiere reparación{% else %}Ubicación desconocida{% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            <tr style="background: #f0f0f0; font-weight: bold;">
+                <td>TOTAL</td>
+                <td>{{ total }}</td>
+                <td>100%</td>
+                <td>-</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div style="text-align: center; margin-top: 2rem;">
+    <a href="{{ url_for('reports') }}" class="btn">← Volver a Reportes</a>
+</div>
+{% endblock %}

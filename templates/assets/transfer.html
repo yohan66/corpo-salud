@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Transferir Activo{% endblock %}
+
+{% block content %}
+<h2>🔄 Transferir Activo</h2>
+
+<div class="card">
+    <h3>📄 {{ asset.name }}</h3>
+    <p><strong>Código:</strong> {{ asset.barcode }}</p>
+    <p><strong>Ubicación Actual:</strong> {{ asset.location.name }}</p>
+    <p><strong>Asignado a:</strong> {{ asset.assigned_to or 'N/A' }}</p>
+</div>
+
+<div class="card">
+    <form method="POST">
+        <div class="form-row">
+            <div class="form-group" style="flex: 2;">
+                <label for="to_location_id">Nueva Ubicación *</label>
+                <select id="to_location_id" name="to_location_id" required>
+                    <option value="">Seleccionar...</option>
+                    {% for loc in locations %}
+                    <option value="{{ loc.id }}">[{{ loc.type }}] {{ loc.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="transfer_date">Fecha de Transferencia *</label>
+                <input type="date" id="transfer_date" name="transfer_date" value="{{ datetime.now().strftime('%Y-%m-%d') }}" required>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group" style="flex: 2;">
+                <label for="transferred_by">Transferido por *</label>
+                <input type="text" id="transferred_by" name="transferred_by" value="{{ current_user.full_name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="authorized_by">Autorizado por</label>
+                <input type="text" id="authorized_by" name="authorized_by" placeholder="Jefe departamento">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="reason">Motivo de la transferencia *</label>
+            <textarea id="reason" name="reason" rows="3" required></textarea>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary">🔄 Confirmar Transferencia</button>
+            <a href="{{ url_for('asset_detail', asset_id=asset.id) }}" class="btn">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

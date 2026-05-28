@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Garantía por Vencer{% endblock %}
+
+{% block content %}
+<h2>⚠️ Reporte: Activos con Garantía por Vencer (6 meses)</h2>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3>Alerta de Garantía</h3>
+        <button onclick="window.print()" class="btn btn-primary">🖨️ Imprimir</button>
+    </div>
+    
+    {% if assets %}
+    <table>
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Activo</th>
+                <th>Categoría</th>
+                <th>Ubicación</th>
+                <th>Fecha de Garantía</th>
+                <th>Días Restantes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asset in assets %}
+            {% set days_left = (asset.warranty_expiry - datetime.now().date()).days %}
+            <tr style="{% if days_left < 30 %}background: #f4e6e6;{% elif days_left < 90 %}background: #f4f0d5;{% endif %}">
+                <td><strong>{{ asset.barcode }}</strong></td>
+                <td>{{ asset.name }}</td>
+                <td>{{ asset.category.name if asset.category else 'N/A' }}</td>
+                <td>{{ asset.location.name if asset.location else 'N/A' }}</td>
+                <td>{{ asset.warranty_expiry.strftime('%d/%m/%Y') }}</td>
+                <td>
+                    <span class="badge" style="{% if days_left < 30 %}background: #e74c3c; color: white;{% elif days_left < 90 %}background: #f39c12; color: white;{% else %}background: #27ae60; color: white;{% endif %}">
+                        {{ days_left }} días
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="text-align: center; color: #27ae60; padding: 2rem;">✓ No hay activos con garantía próxima a vencer</p>
+    {% endif %}
+</div>
+
+<div style="text-align: center; margin-top: 2rem;">
+    <a href="{{ url_for('reports') }}" class="btn">← Volver a Reportes</a>
+</div>
+{% endblock %}

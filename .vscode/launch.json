@@ -1,0 +1,45 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Flask",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "app.py",
+                "FLASK_ENV": "development",
+                "FLASK_DEBUG": "1"
+            },
+            "args": [
+                "run",
+                "--no-debugger",
+                "--no-reload"
+            ],
+            "jinja": true,
+            "justMyCode": true,
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: Direct Script",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/app.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "TrueFlow: Debug with Tracing",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/venv\\Lib\\site-packages\\pip\\__init__.py",
+            "console": "integratedTerminal",
+            "env": {
+                "TRUEFLOW_ENABLED": "1",
+                "TRUEFLOW_TRACE_DIR": "${workspaceFolder}/.trueflow/traces",
+                "TRUEFLOW_SOCKET_PORT": "5678",
+                "PYTHONPATH": "${workspaceFolder}/.trueflow:${env:PYTHONPATH}"
+            }
+        }
+    ]
+}

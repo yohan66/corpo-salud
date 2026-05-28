@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle del Activo{% endblock %}
+
+{% block content %}
+<h2>📄 Detalle del Activo</h2>
+
+<div class="card">
+    <div class="form-row">
+        <div style="flex: 1;">
+            <h3 style="color: #1e3c72;">{{ asset.name }}</h3>
+            <p style="color: #666;">{{ asset.description }}</p>
+        </div>
+        <div style="text-align: right;">
+            <span class="badge badge-{{ asset.status.lower() }}" style="font-size: 1rem; padding: 0.5rem 1rem;">{{ asset.status }}</span>
+            <br>
+            <span style="font-size: 0.9rem;">{{ asset.created_at.strftime('%d/%m/%Y %H:%M') }}</span>
+        </div>
+    </div>
+    
+    <div class="form-row" style="margin-top: 1.5rem;">
+        <div class="form-group">
+            <label><strong>Código:</strong></label>
+            <p>{{ asset.barcode }}</p>
+        </div>
+        <div class="form-group">
+            <label><strong>Tipo:</strong></label>
+            <p><span class="badge {% if asset.asset_type == 'ESTADAL' %}badge-state{% else %}badge-national{% endif %}">{{ asset.asset_type }}</span></p>
+        </div>
+        <div class="form-group">
+            <label><strong>Serie:</strong></label>
+            <p>{{ asset.serial_number or '-' }}</p>
+        </div>
+        <div class="form-group">
+            <label><strong>RFID:</strong></label>
+            <p>{{ asset.rfid_tag or '-' }}</p>
+        </div>
+    </div>
+    
+    <div class="form-row">
+        <div class="form-group">
+            <label><strong>Categoría:</strong></label>
+            <p>{{ asset.category.name if asset.category else 'N/A' }}</p>
+        </div>
+        <div class="form-group">
+            <label><strong>Marca:</strong></label>
+            <p>{{ asset.brand.name if asset.brand else '-' }}</p>
+        </div>
+        <div class="form-group">
+            <label><strong>Modelo:</strong></label>
+            <p>{{ asset.model or '-' }}</p>
+        </div>
+    </div>
+    
+    <div class="form-row">
+        <div class="form-group">
+            <label><strong>Ubicación:</strong></label>
+            <p>{{ asset.location.name if asset.location else 'N/A' }}</p>
+        </div>
+        <div class="form-group">
+            <label><strong>Asignado a:</strong></label>
+            <p>{{ asset.assigned_to or '-' }}</p>
+        </div>
+        <div class="form-group">
+            <label><strong>Operativo:</strong></label>
+            <p>{{ 'Sí' if asset.is_operational else 'No' }}</p>
+        </div>
+    </div>
+    
+    <div class="form-row">
+        <div class="form-group">
+            <label><strong>Adquisición:</strong></label>
+            <p>{{ asset.acquisition_date.strftime('%d/%m/%Y') if asset.acquisition_date else '-' }}</p>
+        </div>
+        <div class="form-group">
+            <label><strong>Antigüedad:</strong></label>
+            <p>{{ asset.age_years }} años</p>
+        </div>
+        <div class="form-group">
+            <label><strong>Garantía:</strong></label>
+            <p>{{ asset.warranty_expiry.strftime('%d/%m/%Y') if asset.warranty_expiry else '-' }}</p>
+            {% if asset.is_under_warranty %}
+            <span class="badge" style="background: #d5f4e6; color: #27ae60;">Vigente</span>
+            {% else %}
+            <span class="badge" style="background: #f4e6d5; color: #d35400;">Vencida</span>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="form-row">
+        <div class="form-group">
+            <label><strong>Precio:</strong></label>
+            <p>Bs. {{ "{:,.2f}".format(asset.purchase_price) if asset.purchase_price else '-' }}</p>
+        </div>
+        <div class="form-group">
+            <label><strong>Factura:</strong></label>
+            <p>{{ asset.invoice_number or '-' }}</p>
+        </div>
+        <div class="form-group">
+            <label><strong>Condición:</strong></label>
+            <p>{{ asset.condition or '-' }}</p>
+        </div>
+    </div>
+    
+    {% if asset.specifications %}
+    <div style="margin-top: 1.5rem;">
+        <h4>🔧 Especificaciones Técnicas</h4>
+        <div class="form-row">
+            {% for key, value in asset.specifications.items() %}
+            <div class="form-group">
+                <label><strong>{{ key|title }}:</strong></label>
+                <p>{{ value }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+        <a href="{{ url_for('edit_asset', asset_id=asset.id) }}" class="btn btn-warning">✏️ Editar</a>
+        <a href="{{ url_for('transfer_asset', asset_id=asset.id) }}" class="btn btn-info">🔄 Transferir</a>
+        <a href="{{ url_for('new_maintenance', asset_id=asset.id) }}" class="btn btn-success">🔧 Mantenimiento</a>
+        {% if current_user.is_admin() %}
+        <form action="{{ url_for('delete_asset', asset_id=asset.id) }}" method="POST" onsubmit="return confirm('¿Eliminar este activo?');">
+            <button type="submit" class="btn btn-danger">Eliminar</button>
+        </form>
+        {% endif %}
+        <a href="{{ url_for('list_assets') }}" class="btn">Volver</a>
+    </div>
+</div>
+
+{% if asset.transfers %}
+<div class="card">
+    <h3>📜 Historial de Transferencias</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Desde</th>
+                <th>Hacia</th>
+                <th>Responsable</th>
+                <th>Motivo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in asset.transfers %}
+            <tr>
+                <td>{{ t.transfer_date.strftime('%d/%m/%Y') }}</td>
+                <td>{{ t.from_location.name if t.from_location else '-' }}</td>
+                <td>{{ t.to_location.name }}</td>
+                <td>{{ t.transferred_by }}</td>
+                <td>{{ t.reason }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% if asset.maintenance_records %}
+<div class="card">
+    <h3>🔧 Historial de Mantenimiento</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Título</th>
+                <th>Descripción</th>
+                <th>Ejecutado por</th>
+                <th>Costo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in asset.maintenance_records %}
+            <tr>
+                <td>{{ m.date.strftime('%d/%m/%Y') }}</td>
+                <td><span class="badge">{{ m.type }}</span></td>
+                <td>{{ m.title }}</td>
+                <td>{{ m.description }}</td>
+                <td>{{ m.performed_by }}</td>
+                <td>Bs. {{ "{:,.2f}".format(m.cost) if m.cost else '-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}
