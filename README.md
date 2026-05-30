@@ -297,4 +297,4 @@ v1.0.0 - Mayo 2026
 
 ---
 
-**Nota**: Este sistema cumple con los requerimientos del Departamento de Soporte Técnico para el control efectivo de bienes estatales y nacionales, garantizando trazabilidad, seguridad y eficiencia en la gestión de activos institucionales.
+**Nota**: Este sistema cumple con los requerimientos del Departamento de Soporte Técnico para el control efectivo de bienes estatales y nacionales, garantizando trazabilidad, seguridad y eficiencia en la gestión de activos institucionales."# corpo-salud"  
