@@ -1,0 +1,21 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "sqlproj: Build corpo salud",
+			"type": "process",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"g:/Nueva carpeta (2)/Codigo Python Johan/CORPO SALUD/corpo salud/corpo salud.sqlproj"
+			],
+			"problemMatcher": "$sqlproj-problem-matcher",
+			"isBackground": true,
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"detail": "Compile el proyecto corpo salud de SQL"
+		}
+	]
+}
